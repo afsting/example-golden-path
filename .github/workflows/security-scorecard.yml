@@ -1,0 +1,85 @@
+name: Security Scorecard Refresh
+
+# Recomputes site/security-scorecard.json from three live sources and
+# writes it directly to the site's S3 bucket, the same pattern as
+# dora-metrics.yml:
+#   - CodeQL code scanning: open alert counts + last analysis (needs
+#     `security-events: read`, which GITHUB_TOKEN can be granted for
+#     same-repo workflows).
+#   - Dependabot: PR activity via the search API (the Dependabot *alerts*
+#     API needs permissions GITHUB_TOKEN can't be granted, so PR activity
+#     is used as a proxy for "Dependabot is active").
+#   - npm audit: current vulnerability counts for infra/'s dependency
+#     tree, computed fresh each run (`npm audit --json`, allowed to exit
+#     non-zero — this workflow is informational only; the actual gate
+#     lives in cdk-diff.yml/deploy.yml).
+#
+# Deliberately does NOT go through git/a PR/cdk deploy — same reasoning
+# as dora-metrics.yml: a GITHUB_TOKEN-authored PR can never trigger
+# cdk-diff.yml's required pull_request check (anti-recursion rule), so an
+# auto-merge would hang forever. The JSON is git-untracked (see
+# .gitignore) — fully reproducible from live data at any time.
+on:
+  schedule:
+    - cron: '43 6 * * *'  # daily, ~06:43 UTC (offset from dora-metrics.yml)
+  workflow_dispatch:
+
+permissions:
+  id-token: write        # Required for OIDC token exchange
+  contents: read
+  security-events: read  # Required to read CodeQL alerts/analyses
+
+jobs:
+  refresh-scorecard:
+    name: Refresh security scorecard
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: infra/package-lock.json
+
+      - name: Install CDK dependencies
+        working-directory: infra
+        run: npm ci
+
+      - name: Run npm audit (informational)
+        working-directory: infra
+        # Always fresh data for the scorecard; not a gate, so failures here
+        # must not fail the job (the actual gate is in cdk-diff.yml /
+        # deploy.yml).
+        run: npm audit --json > ../audit-report.json || true
+
+      - name: Compute security scorecard
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Must match the --audit-level in cdk-diff.yml / deploy.yml.
+          NPM_AUDIT_GATE_LEVEL: high
+        run: node scripts/security-scorecard.mjs
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_METRICS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Look up site bucket name
+        id: bucket
+        run: |
+          BUCKET_NAME=$(aws cloudformation describe-stacks \
+            --stack-name ResumeSiteStack \
+            --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" \
+            --output text)
+          echo "bucket_name=$BUCKET_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Publish security-scorecard.json to S3
+        run: |
+          aws s3 cp site/security-scorecard.json \
+            "s3://${{ steps.bucket.outputs.bucket_name }}/security-scorecard.json" \
+            --cache-control "no-cache, no-store, must-revalidate"

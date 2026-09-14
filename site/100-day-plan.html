@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A 100-day plan for stepping into a developer experience / engineering enablement leadership role, organized by time period and focus area." />
+  <title>My 100-Day Plan – Raymond Page</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4e8a'/%3E%3Ctext x='50' y='68' font-family='Arial,sans-serif' font-size='52' font-weight='700' fill='%23fff' text-anchor='middle'%3ERP%3C/text%3E%3C/svg%3E" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="My 100-Day Plan – Raymond Page" />
+  <meta property="og:description" content="A 100-day plan for stepping into a developer experience / engineering enablement leadership role, organized by time period and focus area." />
+  <meta property="og:url" content="https://resume.pages-enterprise.com/100-day-plan.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="My 100-Day Plan – Raymond Page" />
+  <meta name="twitter:description" content="A 100-day plan for stepping into a developer experience / engineering enablement leadership role, organized by time period and focus area." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Print/PDF layout for this page only — kept inline rather than in
+       styles.css so it doesn't affect print behavior on other pages.
+       A static PDF (100-day-plan.pdf) is pre-generated from this via a
+       headless-browser print pass; see task.md for the regen command. */
+    .print-only, #plan-grid-print { display: none; }
+    .screen-only-subtitle { display: block; }
+
+    @page { size: letter; margin: 0.6in; }
+
+    @media print {
+      .side-nav, header nav#global-nav, .skip-link, #download-pdf-btn,
+      footer, #plan-grid { display: none !important; }
+
+      body.has-side-nav {
+        display: block;
+      }
+
+      header {
+        background: none !important;
+        color: var(--color-text) !important;
+        padding: 0 0 var(--space-sm);
+      }
+
+      header .container { max-width: none; padding: 0; }
+
+      main { padding: 0.15in 0 0; max-width: none; }
+
+      .print-only { display: block; }
+      .screen-only-subtitle { display: none !important; }
+
+      #plan-framing, .callout, #print-marketing {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      main h2 {
+        margin-bottom: 0.15in !important;
+        padding-bottom: 0.05in !important;
+      }
+
+      #plan-framing {
+        margin-bottom: 0.15in !important;
+      }
+
+      .callout {
+        margin: 0.1in 0 !important;
+        padding: 0.15in 0.2in !important;
+      }
+
+      .print-marketing-summary {
+        font-size: 0.85rem;
+        line-height: 1.4;
+        color: var(--color-text);
+        margin: 0.1in 0 0.15in;
+      }
+
+      .print-highlights {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.15in;
+        margin-bottom: 0.15in;
+      }
+
+      .print-highlight {
+        border-left: 3px solid var(--color-accent);
+        padding: 0 0 0 0.15in;
+      }
+
+      .print-highlight-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--color-accent);
+        margin-bottom: 0.05in;
+      }
+
+      .print-highlight-desc {
+        font-size: 0.72rem;
+        color: var(--color-text-muted);
+        line-height: 1.4;
+      }
+
+      /* Rendered as its own set of small per-focus-area sections (see
+         renderPrintSections in 100-day-plan.js) instead of reusing the
+         on-screen big matrix table — a single wide table forces browsers
+         to split rows mid-list across page breaks, leaving mostly-blank
+         continuation pages. Each section here is short enough to mostly
+         fit on one page, and break-inside:avoid keeps it atomic when it
+         does fit. */
+      #plan-grid-print { display: block; }
+
+      .print-plan-section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 0.22in;
+      }
+
+      .print-plan-section h3 {
+        font-size: 0.95rem;
+        color: var(--color-accent);
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 0.08in;
+        margin-bottom: 0.12in;
+      }
+
+      .print-plan-desc {
+        font-weight: 400;
+        color: var(--color-text-muted);
+        font-size: 0.8em;
+      }
+
+      .print-plan-columns {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.12in;
+      }
+
+      .print-plan-col {
+        border: 1px solid var(--color-border);
+        padding: 0.1in;
+      }
+
+      .print-plan-col-label {
+        font-size: 8pt;
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.06in;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 0.05in;
+      }
+
+      .print-plan-col ul {
+        margin: 0;
+        padding-left: 0.9em;
+        line-height: 1.2;
+      }
+
+      /* .prose li in styles.css sets font-size directly on every <li>,
+         which beats font-size set on an ancestor <ul> — a property set
+         directly on an element always wins over an inherited value,
+         regardless of the ancestor rule's specificity. Setting it here
+         directly on .print-plan-col li is what actually takes effect. */
+      .print-plan-col li {
+        font-size: 10px !important;
+        margin-bottom: 0.05in;
+      }
+    }
+  </style>
+</head>
+<body data-page="100-day-plan" class="has-side-nav">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <nav class="side-nav" aria-label="Page navigation">
+    <ul>
+      <li><a href="#focus-baseline">Baseline</a></li>
+      <li><a href="#focus-people">People</a></li>
+      <li><a href="#focus-process">Process</a></li>
+      <li><a href="#focus-technology">Technology</a></li>
+      <li><a href="#focus-personal">Personal</a></li>
+    </ul>
+  </nav>
+
+  <header role="banner">
+    <div class="container">
+      <h1 id="site-name"><a href="index.html" style="color:inherit;text-decoration:none;">Raymond Page</a></h1>
+      <p class="subtitle screen-only-subtitle">My 100-Day Plan</p>
+      <p class="subtitle print-only">IS Manager – Developer Experience (DevEx) Applicant</p>
+      <nav aria-label="Feature navigation" id="global-nav" class="feature-nav"></nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container prose wide" style="padding-top:2.5rem;padding-bottom:4rem;">
+
+    <div id="print-marketing" class="print-only" aria-hidden="true">
+      <!-- print-only, populated by script from content.json — see renderPrintMarketing -->
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-sm);">
+      <h2 id="plan" style="border-bottom:none;">My 100-Day Plan</h2>
+      <a id="download-pdf-btn" class="button" href="100-day-plan.pdf" download>Download PDF</a>
+    </div>
+    <p id="plan-framing" class="prose-narrow">Loading…</p>
+
+    <div class="callout prose-narrow">
+      This reflects the approach and priorities I would take with the
+      information currently available — the plan is flexible based on
+      guidance from leadership and inputs from the team, stakeholders
+      and the developer community.
+    </div>
+
+    <div id="plan-grid" aria-label="100-day plan grid">
+      <!-- populated by script -->
+    </div>
+
+    <div id="plan-grid-print" aria-hidden="true">
+      <!-- print-only, populated by script — see renderPrintSections -->
+    </div>
+
+    <p class="print-only" style="margin-top:var(--space-md);font-size:var(--font-size-sm);color:var(--color-text-muted);">
+      resume.pages-enterprise.com/100-day-plan.html
+    </p>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="container">
+      <p>Raymond Page &middot; <a href="index.html">Résumé</a></p>
+    </div>
+  </footer>
+
+  <script src="nav.js"></script>
+  <script src="100-day-plan.js"></script>
+  <script src="chat-widget.js"></script>
+</body>
+</html>

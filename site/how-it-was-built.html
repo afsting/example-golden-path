@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="How this résumé site was built: AWS S3 + CloudFront, CDK, GitHub Actions OIDC, and AI-assisted engineering." />
+  <title>How This Was Built – Raymond Page</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4e8a'/%3E%3Ctext x='50' y='68' font-family='Arial,sans-serif' font-size='52' font-weight='700' fill='%23fff' text-anchor='middle'%3ERP%3C/text%3E%3C/svg%3E" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="How This Was Built – Raymond Page" />
+  <meta property="og:description" content="How this résumé site was built: AWS S3 + CloudFront, CDK, GitHub Actions OIDC, and AI-assisted engineering." />
+  <meta property="og:url" content="https://resume.pages-enterprise.com/how-it-was-built.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="How This Was Built – Raymond Page" />
+  <meta name="twitter:description" content="How this résumé site was built: AWS S3 + CloudFront, CDK, GitHub Actions OIDC, and AI-assisted engineering." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="how-it-was-built" class="has-side-nav">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <nav class="side-nav" aria-label="Page navigation">
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#access-control">Access Control</a></li>
+      <li><a href="#cicd">CI/CD Pipeline</a></li>
+      <li><a href="#content-architecture">Content Architecture</a></li>
+      <li><a href="#golden-path">Golden-Path Demo</a></li>
+      <li><a href="#devsecops">DevSecOps</a></li>
+      <li><a href="#ai-assistant">AI Assistant Applet</a></li>
+      <li><a href="#ai-assisted">AI-Assisted Build</a></li>
+      <li><a href="#cost">Estimated Cost</a></li>
+      <li><a href="#custom-domain">Custom Domain</a></li>
+      <li><a href="#repo-structure">Repo Structure</a></li>
+    </ul>
+  </nav>
+
+  <header role="banner">
+    <div class="container">
+      <h1 id="site-name"><a href="index.html" style="color:inherit;text-decoration:none;">Raymond Page</a></h1>
+      <p class="subtitle">How This Was Built</p>
+      <nav aria-label="Feature navigation" id="global-nav" class="feature-nav"></nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container prose" style="padding-top:2.5rem;padding-bottom:4rem;">
+
+    <h2 id="overview">Overview</h2>
+    <p>
+      This résumé site is intentionally a small, working demonstration of the
+      platform-engineering practices described in the résumé itself: a golden-path
+      static-site deployment on AWS, all infrastructure defined as code, a real
+      CI/CD pipeline with no long-lived secrets, invite-only access control, a
+      live page-aware AI assistant, and a documented AI-assisted build process.
+      The site is not a novelty — the architecture is the point.
+    </p>
+    <div class="callout">
+      <strong>Why this matters for the DevEx role:</strong> The job description asks
+      for hands-on experience with internal developer platforms, golden paths,
+      IaC, GitHub Actions, and evaluating AI-assisted engineering practices.
+      This project exercises all of those muscles on a real, public artifact.
+    </div>
+
+    <h2 id="architecture">Architecture</h2>
+    <h3>Hosting: S3 + CloudFront (Origin Access Control)</h3>
+    <p>
+      Site files live in a private S3 bucket — no public access is enabled at the
+      bucket level. A CloudFront distribution sits in front using
+      <strong>Origin Access Control (OAC)</strong>, the current AWS-recommended
+      approach (replacing the legacy Origin Access Identity). CloudFront is the
+      only authorized principal that can read objects from the bucket.
+    </p>
+    <p>
+      This is the textbook "golden path" architecture for static sites on AWS:
+      fast global edge delivery, HTTPS enforced end-to-end, origin kept private,
+      and essentially zero operational overhead at this traffic level.
+    </p>
+
+    <h3>Caching Strategy</h3>
+    <ul>
+      <li><strong>HTML files</strong> — <code>Cache-Control: no-cache</code> (1-second CloudFront TTL). Updates appear immediately after a CloudFront invalidation.</li>
+      <li><strong>Static assets</strong> (CSS, JS, images) — long cache TTL (1 year). These are treated as immutable; change the filename/hash to bust cache.</li>
+    </ul>
+
+    <h3>HTTPS &amp; Custom Domain</h3>
+    <p>
+      HTTP-to-HTTPS redirect is enforced at the CloudFront level. The site runs on
+      its own custom domain, <code>resume.pages-enterprise.com</code> — see
+      <a href="#custom-domain">Custom Domain</a> below for how that's wired up.
+    </p>
+
+    <h3>Infrastructure as Code: AWS CDK (TypeScript)</h3>
+    <p>
+      All AWS resources — the S3 bucket, CloudFront distribution, OAC, bucket policy,
+      and cache behaviors — are defined in a single CDK stack
+      (<code>infra/lib/resume-site-stack.ts</code>). No resources were created
+      manually in the console. This means:
+    </p>
+    <ul>
+      <li>The infrastructure is reproducible, reviewable, and version-controlled.</li>
+      <li>Drift is detectable via <code>cdk diff</code>.</li>
+      <li>Teardown is a single <code>cdk destroy</code>.</li>
+    </ul>
+
+    <h2 id="access-control">Access Control: Email OTP Gate</h2>
+    <p>
+      The deployed site is <strong>invite-only</strong> — every page is gated
+      behind email verification, not just visible to anyone with the URL. A
+      <strong>CloudFront Function</strong> (viewer-request, not Lambda@Edge —
+      cheaper and lower-latency, and modern CloudFront Functions support
+      HMAC-SHA256 verification via the built-in <code>crypto</code> module) checks
+      every request for a valid signed session cookie before it ever reaches S3.
+      No cookie, or an invalid one, redirects to <code>/login.html</code> — the
+      one path deliberately exempted from the check.
+    </p>
+    <p>
+      A second CloudFront behavior (<code>/auth/*</code>, uncached, so
+      <code>Set-Cookie</code> responses reach the browser same-origin) routes to
+      an API Gateway HTTP API backed by several Lambdas, including:
+    </p>
+    <ul>
+      <li><strong>Request code</strong> — checks the submitted email against an allowlist (DynamoDB — exact addresses or domain suffixes), generates a 6-digit OTP, stores only its <em>hash</em> with a short expiry, and emails it via Resend. Returns the same generic response whether or not the email is actually allowlisted, to avoid leaking who's on the list.</li>
+      <li><strong>Verify code</strong> — checks the submitted code against the stored hash, enforces a max-attempts lockout, and on success issues an <code>HttpOnly; Secure; SameSite=Lax</code> session cookie (14-day expiry) signed with an HMAC secret shared between the Lambdas and the CloudFront Function via a CloudFront KeyValueStore.</li>
+      <li><strong>Admin allowlist</strong> — a small <code>/admin.html</code> page (linked nowhere public) lets an admin session list/add/remove allowlist entries, and can also generate a short-lived, time-boxed <strong>magic link</strong> as a login fallback for anyone whose email doesn't arrive for reasons outside this site's control. Authorization comes entirely from an <code>admin</code> claim baked into the signed session token at login time — re-checked server-side on every request, never trusted from the client.</li>
+    </ul>
+    <p>
+      Login email was originally sent via Amazon SES, which turned out to be
+      the wrong tool for a low-volume personal project: SES's sandbox mode
+      requires every recipient to individually verify their address before
+      they can receive mail, and two separate production-access requests
+      (each with a detailed, specific use-case description) were denied with
+      the same boilerplate response and no actionable reason given either
+      time. That pattern is consistent with automated risk-scoring on
+      account age and history rather than a human evaluating the actual
+      request — not something a better-written appeal was likely to change.
+      Rather than keep working around it, the send path was migrated to
+      <a href="https://resend.com" target="_blank" rel="noopener">Resend</a>,
+      a transactional-email API that only requires the <em>sending domain</em>
+      to be verified (DKIM/SPF/DMARC — the same category of DNS setup SES
+      also needed), not each individual recipient. The migration touched one
+      Lambda and a handful of DNS records; the rest of the OTP flow above is
+      unchanged.
+    </p>
+
+    <h2 id="cicd">CI/CD Pipeline (GitHub Actions)</h2>
+    <h3>No Long-Lived AWS Keys</h3>
+    <p>
+      The pipeline uses <strong>GitHub OIDC federation</strong> to assume an AWS IAM
+      role — there are no AWS access keys stored as GitHub secrets. On each push to
+      <code>main</code>, GitHub presents a short-lived OIDC token; AWS STS validates
+      it and issues temporary credentials scoped to exactly the permissions needed
+      for deployment.
+    </p>
+    <p>
+      This is a meaningful DevSecOps detail: credential rotation is automatic,
+      blast radius is limited, and there are no static secrets to leak or rotate.
+    </p>
+
+    <h3>Deploy Workflow (<code>deploy.yml</code>)</h3>
+    <ol>
+      <li>Check out code.</li>
+      <li>Install Node dependencies for the CDK app (<code>infra/</code>).</li>
+      <li>Assume the deployment IAM role via OIDC (<code>aws-actions/configure-aws-credentials</code>).</li>
+      <li>Run <code>cdk deploy --require-approval never</code> to provision/update infrastructure.</li>
+      <li>Sync site files to S3 (<code>aws s3 sync</code>) with appropriate cache-control headers.</li>
+      <li>Create a CloudFront invalidation for <code>/*</code> so updated HTML is served immediately.</li>
+    </ol>
+
+    <h3>PR Infrastructure Diff (<code>cdk-diff.yml</code>)</h3>
+    <p>
+      On pull requests that touch <code>infra/**</code>, a separate workflow runs
+      <code>cdk diff</code> and posts the output as a PR comment. Infrastructure
+      changes are visible in review before merge — a small but meaningful guardrail
+      that mirrors enterprise change-management practices.
+    </p>
+
+    <h2 id="content-architecture">Content Architecture: Data-Driven Résumé</h2>
+    <p>
+      Résumé content lives in <code>site/content.json</code> — a structured JSON
+      file separate from the HTML template and rendering logic. Updating the résumé
+      means editing the JSON, not touching HTML. The renderer (<code>site/build.js</code>)
+      reads the JSON at page load and populates the DOM.
+    </p>
+    <p>
+      This "content as data" separation mirrors the golden-path / platform-template
+      pattern central to developer experience work: the <em>what</em> (content) is
+      decoupled from the <em>how</em> (template), so authors don't need to understand
+      the rendering layer to update content.
+    </p>
+
+    <h2 id="golden-path">Golden-Path / Internal Developer Platform Demo</h2>
+    <p>
+      Beyond the static-site architecture itself, this repo demonstrates two
+      concrete, low-cost IDP practices: it's enabled as a GitHub
+      <strong>template repository</strong> (a literal "use this template"
+      clone-and-go starting point, not just a description of one), and it
+      ships a <code>catalog-info.yaml</code> at the repo root — Backstage's
+      service-catalog descriptor format — describing this service's owner,
+      links, and lifecycle stage. Neither requires running a full IDP
+      (Backstage, Port, Cortex, etc.) to be a valid, inspectable artifact.
+    </p>
+    <p>
+      <a class="button" href="https://github.com/new?template_name=developer-experience-concepts&amp;template_owner=afsting" target="_blank" rel="noopener noreferrer">Use this template →</a>
+    </p>
+    <div class="callout">
+      <strong>Grounded in real experience:</strong> This mirrors work already
+      done at scale — one of the first templates onboarded to Mutual of
+      Omaha's Common Technology Platform Service Portal (CTPSP) was a
+      MuleSoft API template Raymond authored, which remains heavily used
+      today and continues to save developers significant time baselining
+      new MuleSoft APIs.
+    </div>
+    <h3>Live <code>catalog-info.yaml</code></h3>
+    <p>
+      Fetched at page load directly from this repo's default branch — not
+      pasted in, so it always reflects the real file.
+    </p>
+    <pre class="catalog-render"><code id="catalog-info-render">Loading…</code></pre>
+
+    <h2 id="devsecops">DevSecOps CI Hardening</h2>
+    <p>
+      The pipeline described above also carries four concrete DevSecOps
+      controls, all enforced automatically on every push/PR rather than
+      relying on a manual review step:
+    </p>
+    <ul>
+      <li><strong>CodeQL</strong> static analysis (SAST) — scans <code>infra/**</code> TypeScript and <code>site/**</code> JavaScript on every push to <code>main</code>, every PR, and a weekly schedule.</li>
+      <li><strong>Dependabot</strong> — weekly automated PRs for outdated npm packages (<code>infra/</code>, with AWS SDK/CDK packages grouped to reduce noise) and GitHub Actions versions.</li>
+      <li><strong>Gated <code>npm audit</code></strong> — a required CI step in both <code>cdk-diff.yml</code> and <code>deploy.yml</code> that fails the build on newly introduced vulnerabilities above a configured severity threshold.</li>
+      <li><strong>ESLint</strong> — also gated in both workflows, catching real correctness issues (e.g. dead code) before they reach <code>main</code>.</li>
+    </ul>
+    <div class="badges" aria-label="Live CI status badges">
+      <a href="https://github.com/afsting/developer-experience-concepts/actions/workflows/codeql.yml" target="_blank" rel="noopener noreferrer">
+        <img src="https://github.com/afsting/developer-experience-concepts/actions/workflows/codeql.yml/badge.svg" alt="CodeQL workflow status" />
+      </a>
+      <a href="https://github.com/afsting/developer-experience-concepts/actions/workflows/deploy.yml" target="_blank" rel="noopener noreferrer">
+        <img src="https://github.com/afsting/developer-experience-concepts/actions/workflows/deploy.yml/badge.svg" alt="Deploy workflow status" />
+      </a>
+      <a href="https://github.com/afsting/developer-experience-concepts/actions/workflows/cdk-diff.yml" target="_blank" rel="noopener noreferrer">
+        <img src="https://github.com/afsting/developer-experience-concepts/actions/workflows/cdk-diff.yml/badge.svg" alt="CDK Diff workflow status" />
+      </a>
+    </div>
+    <p>
+      These badges are GitHub's own live status images — they aren't
+      screenshots, they update automatically as the workflows run. See the
+      <a href="security-scorecard.html">Security Scorecard</a> for a working
+      artifact built the same way as the DORA metrics page: a scheduled
+      job pulls this repo's own CodeQL alert counts, Dependabot PR activity,
+      and current <code>npm audit</code> findings and renders them live.
+    </p>
+
+    <h2 id="ai-assistant">AI Assistant Applet</h2>
+    <p>
+      Every page carries a small floating <strong>Ask AI</strong> button — a
+      page-aware assistant that answers questions grounded in this site's own
+      published data (the résumé, DORA metrics, security scorecard, and
+      100-day plan JSON). It knows which page you're on and says so; try it.
+    </p>
+    <p>
+      Deliberately <strong>no Bedrock Agent or Knowledge Base</strong>: this
+      site's entire public data surface is well under 100KB, trivially small
+      relative to any modern model's context window, so a vector store would
+      add real always-on cost (OpenSearch Serverless has a nontrivial
+      always-on minimum) for zero benefit. Instead, a Lambda calls the Bedrock
+      Runtime <code>Converse</code> API directly — Claude Haiku via its
+      cross-region inference profile — with a system prompt built fresh each
+      request from the site's own JSON files.
+    </p>
+    <p>
+      The applet sits behind the same OTP session gate as the rest of the
+      site, with its own layers of defense specific to a public chat surface:
+      a <strong>Bedrock Guardrail</strong> (content filters including
+      prompt-attack detection, since page context rides along in every
+      prompt; PII anonymization for phone/SSN/address — deliberately
+      <em>not</em> name or email, since answering with Raymond's own name and
+      contact address is the entire point), a dedicated least-privilege IAM
+      role separate from every other role in this stack, a combined
+      rate-limit-and-message-cap enforced atomically in DynamoDB, and a
+      runtime kill switch that disables it instantly without a redeploy. The
+      full conversation is sent with every request (not just the newest
+      message) so the assistant has real memory across turns and survives a
+      page refresh.
+    </p>
+
+    <h2 id="ai-assisted">AI-Assisted Build Process</h2>
+
+    <h3>What Was AI-Assisted</h3>
+    <ul>
+      <li><strong>Initial scaffolding</strong> — project structure, CDK stack skeleton, GitHub Actions workflow YAML, and this prose were drafted with Claude (Anthropic) as a co-author, guided by specific prompts describing the architecture requirements.</li>
+      <li><strong>CSS design system</strong> — the custom-property-based stylesheet was drafted by the AI and reviewed/adjusted for accessibility (contrast ratios, focus styles, responsive breakpoints).</li>
+      <li><strong>IAM policy scoping</strong> — the AI drafted least-privilege IAM policy statements; each was reviewed against AWS documentation before use.</li>
+    </ul>
+    <h3>What Was Human-Reviewed and Edited</h3>
+    <ul>
+      <li><strong>All résumé content</strong> — sourced directly from the source résumé document. No AI-generated claims about experience, titles, dates, or metrics.</li>
+      <li><strong>Security choices</strong> — OIDC over static keys, OAC over public bucket, block-public-access settings — each was a deliberate decision, not an AI default.</li>
+      <li><strong>CDK construct selection</strong> — e.g., choosing <code>aws_cloudfront.Distribution</code> with OAC over the legacy <code>CloudFrontWebDistribution</code>.</li>
+      <li><strong>This write-up</strong> — drafted with AI assistance, then read and edited by hand for accuracy and tone.</li>
+    </ul>
+    <h3>The Broader Point</h3>
+    <p>
+      AI assistance accelerated the initial scaffolding significantly — the kind of
+      work that normally takes an hour of copy-pasting boilerplate took minutes.
+      The value was in moving quickly from "blank repo" to "working skeleton" so
+      human judgment could be applied to the parts that matter: content accuracy,
+      security posture, and architectural decisions. That is exactly the model the
+      DevEx role is meant to enable at scale.
+    </p>
+
+    <h2 id="cost">Estimated AWS Cost</h2>
+    <p>
+      At résumé-traffic volumes (tens to low hundreds of requests/month), every
+      piece of this stack is designed to stay near-zero cost, not just the
+      original S3 + CloudFront layer:
+    </p>
+    <ul>
+      <li><strong>S3</strong>: effectively $0.00 (well under 1 GB storage, negligible GET requests via CloudFront).</li>
+      <li><strong>CloudFront</strong>: 1 TB free transfer/month on the free tier; well under that.</li>
+      <li><strong>Route 53</strong>: ~$0.50/month hosted zone, plus the domain's annual registration cost amortized.</li>
+      <li><strong>OTP gate</strong> (Lambda, API Gateway, DynamoDB, Resend): effectively $0.00 at this request volume — all pay-per-request or free-tier, well under Resend's free-tier send limit.</li>
+      <li><strong>AI assistant applet</strong> (Bedrock Haiku, plus the same Lambda/API Gateway/DynamoDB pattern): realistically ~$1-2/month even with regular interview-time usage, well under a $20/month ceiling set for the feature.</li>
+      <li><strong>Total: under $1.50/month</strong> in steady state, watched by an AWS Budgets alarm (whole-account, $10/month threshold, forecasted and actual notifications) — a concrete, live demo of cost awareness rather than just a claim.</li>
+    </ul>
+
+    <h2 id="custom-domain">Custom Domain</h2>
+    <p>
+      The site is served at <code>resume.pages-enterprise.com</code>, not a
+      bare <code>*.cloudfront.net</code> URL — entirely provisioned by CDK,
+      no manual console steps:
+    </p>
+    <ul>
+      <li>A public ACM certificate in <code>us-east-1</code> (required for CloudFront), <strong>DNS-validated</strong> rather than email-validated, referencing the pre-existing hosted zone by fixed attributes (not <code>fromLookup</code>) so <code>cdk synth</code> doesn't need account/region context.</li>
+      <li>Route 53 alias <code>A</code>/<code>AAAA</code> records pointing the subdomain at the CloudFront distribution.</li>
+      <li>Resend verified at the <strong>domain level</strong> against a dedicated subdomain, <code>send.pages-enterprise.com</code> — DKIM/SPF/DMARC records provisioned directly via the AWS CLI against the same Route 53 hosted zone, kept separate from any of the zone's other records so nothing collides.</li>
+    </ul>
+
+    <h2 id="repo-structure">Repository Structure</h2>
+    <pre><code>developer-experience-concepts/
+├── .github/
+│   ├── workflows/
+│   │   ├── deploy.yml               # Deploy on push to main
+│   │   ├── cdk-diff.yml             # CDK diff on every PR (self-gating)
+│   │   ├── codeql.yml               # SAST scanning
+│   │   ├── dora-metrics.yml         # Scheduled DORA metrics refresh
+│   │   └── security-scorecard.yml   # Scheduled security scorecard refresh
+│   ├── dependabot.yml
+│   └── pull_request_template.md
+├── catalog-info.yaml            # Backstage service-catalog descriptor
+├── infra/                       # AWS CDK app (TypeScript)
+│   ├── bin/resume-site.ts       # CDK app entry point
+│   ├── lib/resume-site-stack.ts # The whole stack: S3/CloudFront, OTP
+│   │                             # gate, DORA/security IAM, AI applet,
+│   │                             # custom domain, cost alarm
+│   ├── lambda/
+│   │   ├── requestCode/ verifyCode/ admin/ kvsSeed/  # OTP gate
+│   │   ├── chat/                # AI assistant applet backend
+│   │   └── common/              # Shared session/dynamo/S3 helpers
+│   ├── cloudfront-functions/session-check.js  # OTP gate edge check
+│   ├── test/                    # jest unit tests (aws-cdk-lib assertions)
+│   └── .eslintrc.json
+├── scripts/                      # dependency-free Node scripts
+│   ├── dora-metrics.mjs
+│   └── security-scorecard.mjs
+├── site/                         # Static site content
+│   ├── index.html                # Résumé page (template)
+│   ├── how-it-was-built.html     # This page
+│   ├── dora-metrics.html / .js   # DORA scorecard
+│   ├── security-scorecard.html / .js
+│   ├── 100-day-plan.html / .js / .json / .pdf
+│   ├── login.html / admin.html   # OTP gate UI
+│   ├── chat-widget.js            # AI assistant applet frontend
+│   ├── nav.js / catalog-render.js
+│   ├── styles.css                # Design system
+│   ├── build.js                  # Résumé content renderer
+│   └── content.json              # Résumé data (edit this to update content)
+├── LICENSE
+└── README.md</code></pre>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="container">
+      <p>Raymond Page &middot; <a href="index.html">Résumé</a></p>
+    </div>
+  </footer>
+
+  <script src="nav.js"></script>
+  <script src="catalog-render.js"></script>
+  <script src="chat-widget.js"></script>
+</body>
+</html>

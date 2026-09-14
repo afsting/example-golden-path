@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Security scorecard for this repo: live CodeQL alert counts, Dependabot PR activity, and current npm audit findings." />
+  <title>Security Scorecard – Raymond Page</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4e8a'/%3E%3Ctext x='50' y='68' font-family='Arial,sans-serif' font-size='52' font-weight='700' fill='%23fff' text-anchor='middle'%3ERP%3C/text%3E%3C/svg%3E" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Security Scorecard – Raymond Page" />
+  <meta property="og:description" content="Security scorecard for this repo: live CodeQL alert counts, Dependabot PR activity, and current npm audit findings." />
+  <meta property="og:url" content="https://resume.pages-enterprise.com/security-scorecard.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Security Scorecard – Raymond Page" />
+  <meta name="twitter:description" content="Security scorecard for this repo: live CodeQL alert counts, Dependabot PR activity, and current npm audit findings." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="security-scorecard" class="has-side-nav">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <nav class="side-nav" aria-label="Page navigation">
+    <ul>
+      <li><a href="#code-scanning">Code Scanning</a></li>
+      <li><a href="#dependabot">Dependabot</a></li>
+      <li><a href="#npm-audit">npm audit</a></li>
+    </ul>
+  </nav>
+
+  <header role="banner">
+    <div class="container">
+      <h1 id="site-name"><a href="index.html" style="color:inherit;text-decoration:none;">Raymond Page</a></h1>
+      <p class="subtitle">Security Scorecard</p>
+      <nav aria-label="Feature navigation" id="global-nav" class="feature-nav"></nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container prose" style="padding-top:2.5rem;padding-bottom:4rem;">
+
+    <h2>DevSecOps Scorecard</h2>
+    <p>
+      Same "content as data" pattern as the <a href="dora-metrics.html">DORA metrics
+      scorecard</a>: a scheduled workflow
+      (<code>.github/workflows/security-scorecard.yml</code>) computes this
+      page's data from live sources — the GitHub code scanning API, the
+      GitHub search API, and a fresh <code>npm audit</code> run — and writes
+      it to this repo's own S3 bucket. Nothing here is a mockup.
+    </p>
+    <div class="callout" id="scorecard-meta">Loading…</div>
+
+    <h2 id="code-scanning">Code Scanning (CodeQL)</h2>
+    <div class="metrics-grid" id="code-scanning-grid" aria-label="CodeQL metrics">
+      <!-- populated by script -->
+    </div>
+
+    <h2 id="dependabot">Dependabot Activity</h2>
+    <div class="metrics-grid" id="dependabot-grid" aria-label="Dependabot metrics">
+      <!-- populated by script -->
+    </div>
+
+    <h2 id="npm-audit">npm audit (infra/)</h2>
+    <div class="metrics-grid" id="npm-audit-grid" aria-label="npm audit metrics">
+      <!-- populated by script -->
+    </div>
+
+    <div class="callout">
+      <strong>Note:</strong> Dependabot doesn't expose an alerts API that
+      the default <code>GITHUB_TOKEN</code> can be granted access to, so
+      "Dependabot Activity" reflects merged/opened dependency-update PRs
+      as a proxy for the feature being active — not an open-vulnerability
+      count. See <a href="how-it-was-built.html#devsecops">How This Was
+      Built</a> for the full write-up.
+    </div>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="container">
+      <p>Raymond Page &middot; <a href="index.html">Résumé</a></p>
+    </div>
+  </footer>
+
+  <script src="nav.js"></script>
+  <script src="security-scorecard.js"></script>
+  <script src="chat-widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+{
+  "name": "Raymond Page",
+  "title": "Engineering Leader | Developer Experience | AI Enablement | Platform Strategy",
+  "email": "raymond.page@mutualofomaha.com",
+  "linkedin": "https://www.linkedin.com/in/raymond-page",
+  "summary": "Engineering leader with 12 years of enterprise software engineering, cloud platform, and developer enablement experience at Mutual of Omaha, preceded by a 26-year U.S. Air Force career progressing from enlisted airman to field grade officer. Proven track record leading cross-functional teams, building shared platform capabilities, driving adoption of engineering standards, and fostering technology communities that improve organizational effectiveness. Recognized within Mutual of Omaha as a technology leader in API-led architecture, MuleSoft, cloud integration, and AI-assisted engineering practices. Focused on helping engineers deliver business outcomes through shared platforms, common patterns, and accessible organizational knowledge.",
+  "competencies": [
+    "API-Led Architecture & MuleSoft Integration",
+    "Internal Developer Platform / Service Catalog",
+    "Golden Paths & Templates",
+    "DORA Metrics & Software Engineering Intelligence (SEI)",
+    "DevSecOps",
+    "Cloud Engineering (AWS)",
+    "GitHub Enterprise & GitHub Actions",
+    "AI-Assisted & Agentic Software Development",
+    "Platform Strategy",
+    "Engineering Standards & Reusable Patterns",
+    "Engineering Enablement & Training Programs",
+    "Community of Practice Leadership",
+    "Agile / SAFe Delivery",
+    "Organizational Change & Technology Adoption",
+    "Cross-Functional Leadership",
+    "Enterprise Modernization"
+  ],
+  "highlights": [
+    {
+      "title": "Strategic Enterprise Initiative Leadership",
+      "description": "Consistently selected by leadership to drive strategic enterprise initiatives — including MuleSoft Adoption, the Process API Initiative, and Service AI Enablement — leveraging expertise in API-led architecture, cloud integration, and emerging AI capabilities."
+    },
+    {
+      "title": "AI-Enabled Customer Service Delivery",
+      "description": "Drove development and productionization of AI-enabled customer service capabilities for the Service AI Enablement initiative, accelerating delivery across customer, policy, billing, claims, and beneficiary functions."
+    },
+    {
+      "title": "Engineering Enablement Programs",
+      "description": "Created and launched a self-service, video-based training curriculum (MuleSoft Days) that strengthened engineering skill development and reinforced golden-path adoption — 53+ documented participants, with continued organic use enterprise-wide."
+    },
+    {
+      "title": "Communities of Practice",
+      "description": "Founder and facilitator of enterprise Communities of Practice spanning AI, AR/VR, and cloud engineering — driving knowledge sharing and accelerating organizational adoption of new capabilities."
+    },
+    {
+      "title": "Engineering Leadership at Scale",
+      "description": "Led engineering teams ranging from 5–14 members across four initiatives over the past decade, including 12 direct reports as Information Services Manager."
+    }
+  ],
+  "experience": [
+    {
+      "company": "Mutual of Omaha",
+      "location": "Omaha, NE",
+      "roles": [
+        {
+          "title": "Software Engineer",
+          "start": "2019",
+          "end": "Present",
+          "bullets": [
+            "Designed and implemented enterprise API and integration solutions using MuleSoft, AWS, and Spring Boot supporting customer, policy, billing, and claims capabilities.",
+            "Selected to participate in enterprise evaluation and user acceptance testing of GitHub Enterprise against GitLab, informing the organization's DevOps toolchain strategy.",
+            "Engineering lead for the Process API Initiative, directing a team of 5 developers on API-led modernization efforts.",
+            "Co-lead for Service AI Enablement, jointly leading a team of 7 developers building AI-enabled customer service capabilities.",
+            "Serve as subject matter expert and leading advocate for API-led architecture and MuleSoft adoption across the enterprise engineering organization.",
+            "Defined MuleSoft developer skill and competency requirements, establishing a framework used for hiring, onboarding, and skills development enterprise-wide.",
+            "Created and launched the MuleSoft Days training program, designing a self-service, video-based curriculum optimized to strengthen engineering intelligence while reinforcing reuse and pipeline capability adoption; 53+ documented participants, with continued organic use enterprise-wide.",
+            "Authored one of the first MuleSoft API templates onboarded to the enterprise's Common Technology Platform Service Portal (CTPSP), a golden-path starting point still heavily used today that significantly reduces developer time to baseline new MuleSoft APIs.",
+            "Developed additional engineering templates and reference implementations, and partnered with architecture, product, and business stakeholders to expand shared enterprise services and improve discoverability of system capabilities.",
+            "Founded and facilitate Communities of Practice across AI, AR/VR, and cloud engineering, driving knowledge sharing and accelerating organizational adoption of new capabilities.",
+            "Champion AI-assisted and agentic development approaches to improve team productivity and engineering effectiveness."
+          ]
+        },
+        {
+          "title": "Information Services Manager",
+          "start": "2018",
+          "end": "2019",
+          "bullets": [
+            "Directly managed a team of 12 engineers and analysts, owning hiring, performance management, coaching, and career development while leading Agile software delivery for Senior Health/Medicare marketplace initiatives.",
+            "Built team strength grids and skill matrixes to guide workforce planning, individual development plans, and succession readiness across the team.",
+            "Applied servant leadership principles to strengthen team performance and support delivery of customer-facing capabilities.",
+            "Aligned team execution to Agile Release Train objectives and enterprise priorities in partnership with business sponsors."
+          ]
+        },
+        {
+          "title": "Enterprise Salesforce Scrum Master / Project Manager",
+          "start": "2016",
+          "end": "2018",
+          "bullets": [
+            "Led a cross-functional Salesforce development team of 14 engineers across multiple enterprise implementation initiatives, directing sprint execution, technical delivery, and stakeholder alignment.",
+            "Helped establish Mutual of Omaha's early adoption of the Scaled Agile Framework (SAFe), codifying delivery patterns later scaled enterprise-wide.",
+            "Coordinated delivery across product owners and technical leadership while supporting organizational change initiatives."
+          ]
+        },
+        {
+          "title": "IS Portfolio Manager",
+          "start": "2015",
+          "end": "2016",
+          "bullets": [
+            "Managed and coordinated a $100M enterprise technology portfolio spanning multiple business and engineering organizations.",
+            "Led adoption of enterprise Agile planning and portfolio management tooling across multiple portfolios.",
+            "Drove cross-organizational alignment among executive sponsors and technology leadership to improve planning transparency and execution.",
+            "Supported enterprise culture transformation initiatives in partnership with Senn Delaney."
+          ]
+        },
+        {
+          "title": "Scrum Master",
+          "start": "2014",
+          "end": "2015",
+          "bullets": [
+            "Coached teams through early adoption of Agile practices, improving engagement, transparency, and delivery predictability.",
+            "Managed enterprise strategy and portfolio backlogs, aligning technology execution with business priorities.",
+            "Reduced governance friction while maintaining visibility and accountability across program stakeholders."
+          ]
+        }
+      ]
+    },
+    {
+      "company": "United States Air Force",
+      "location": "Various duty stations",
+      "roles": [
+        {
+          "title": "Officer & Technology Leader",
+          "start": "1988",
+          "end": "2014",
+          "bullets": [
+            "Officer and technology leader with 26 years of progressive leadership experience spanning communications, information technology, systems development, operations, and organizational management.",
+            "Advanced from enlisted member to field grade officer through demonstrated leadership and technical excellence.",
+            "Led geographically dispersed teams in high-reliability operational environments.",
+            "Managed large-scale technology initiatives, vendor relationships, and mission-critical systems.",
+            "Directed development efforts supporting next-generation geospatial weather systems.",
+            "Managed contractor and vendor engagements supporting operations at Kennedy Space Center."
+          ]
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Master of Arts (MA)",
+      "field": "Military History",
+      "institution": "Norwich University",
+      "note": "2006 – 2009"
+    },
+    {
+      "degree": "Master of Science (MS)",
+      "field": "Military Operational Science",
+      "institution": "Air University",
+      "note": "2011 – 2013"
+    },
+    {
+      "degree": "Bachelor of Science (BS)",
+      "field": "Information Technology Management",
+      "institution": "Bellevue University",
+      "note": "1999 – 2002"
+    }
+  ],
+  "note_content": "Resume content is curated from docs/Raymond_Page_Resume_AUG2026.docx (git-ignored; see .gitignore for rationale). Phone number and street-level address from the source document are intentionally omitted here — only email and LinkedIn are surfaced publicly. When the source resume is updated, re-sync this file by hand."
+}
+

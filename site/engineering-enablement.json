@@ -1,0 +1,103 @@
+{
+  "title": "Engineering Enablement Programs",
+  "framing": "How I build enablement programs, worked example: MuleSoft Days, a training program I designed and iterated through three in-person pilots before turning it into a 12-module self-paced course — 53+ documented participants, with continued organic use years after I handed it off. The office-hours/coaching cadence below is a proposed extension, not something the original program had.",
+  "case_study": {
+    "name": "MuleSoft Days",
+    "problem": "Mutual of Omaha launched a major initiative to move to API-led architecture, choosing MuleSoft as the platform. I was on the team that brought MuleSoft into the company and became a subject matter expert on it. As teams started onboarding, a real training gap surfaced fast: the official MuleSoft and third-party training only covered how MuleSoft worked out of the box, not our highly customized instance — a custom CI/CD pipeline, plus the added complexity of running both CloudHub (cloud runtimes) and Runtime Fabric (on-prem runtimes) side by side. Without coherent training, the initiative's timeline was genuinely at risk.",
+    "approach": "I built the program iteratively rather than designing it top-down: a two-week in-person pilot with six participants, refined to one week for the second run, then refined again to five half-day in-person sessions plus self-paced work for the third. Taking what each round taught me, I turned it into a 12-module, self-paced, hands-on course carrying a novice MuleSoft developer to intermediate proficiency, anchored throughout in the company's actual golden-path pattern rather than generic MuleSoft concepts.",
+    "outcome": "53+ documented participants, with consistently positive feedback and survey results. I refreshed the videos about a year after the initial release; the program has run largely unmaintained since I moved to other initiatives, and it shows in places — the CI/CD module still references Bitbucket and Jenkins, since replaced by GitHub — but the core content on MuleSoft development, testing, and the company's architecture has stayed relevant enough that new MuleSoft engineers still use it today."
+  },
+  "learning_path": [
+    {
+      "module": "1",
+      "title": "Specification Driven Development",
+      "format": "Self-paced, hands-on",
+      "description": "Writing and agreeing on the API specification before implementation begins, rather than letting the contract emerge from the code."
+    },
+    {
+      "module": "2",
+      "title": "CTPSP MuleSoft API Template",
+      "format": "Self-paced, hands-on",
+      "description": "The company's golden-path starting point for a new MuleSoft API, onboarded to the Common Technology Platform Service Portal."
+    },
+    {
+      "module": "3",
+      "title": "CI/CD Pipeline (Bitbucket & Jenkins)",
+      "format": "Self-paced, hands-on",
+      "description": "Building and deploying through the company's actual pipeline tooling, not a generic MuleSoft CI/CD walkthrough. (Now the one part of the course that's genuinely dated — the company has since moved to GitHub.)"
+    },
+    {
+      "module": "4",
+      "title": "MuleSoft Flow Development",
+      "format": "Self-paced, hands-on",
+      "description": "Core flow-building fundamentals in Anypoint Studio."
+    },
+    {
+      "module": "5",
+      "title": "Implementing MUnit Tests",
+      "format": "Self-paced, hands-on",
+      "description": "Automated testing for MuleSoft flows using MuleSoft's own MUnit framework."
+    },
+    {
+      "module": "6",
+      "title": "Refactoring and Further Development of an Existing API",
+      "format": "Self-paced, hands-on",
+      "description": "Working inside an API that already exists and has real constraints, not just building greenfield."
+    },
+    {
+      "module": "7",
+      "title": "Configuring OAuth",
+      "format": "Self-paced, hands-on",
+      "description": "Securing an API with OAuth."
+    },
+    {
+      "module": "8",
+      "title": "API Alerts and Functional Monitoring",
+      "format": "Self-paced, hands-on",
+      "description": "Setting up monitoring and alerting for an API once it's deployed, not just building it and walking away."
+    },
+    {
+      "module": "9",
+      "title": "DataWeave Fundamentals",
+      "format": "Self-paced, hands-on",
+      "description": "MuleSoft's data transformation language."
+    },
+    {
+      "module": "10",
+      "title": "MuleSoft Proxies",
+      "format": "Self-paced, hands-on",
+      "description": "API proxy configuration and patterns."
+    },
+    {
+      "module": "11",
+      "title": "EDP & CTP Support Services",
+      "format": "Self-paced, hands-on",
+      "description": "Who to go to for what: the Enterprise Developer Platform (EDP) team that owns MuleSoft, and the broader Common Technology Platform (CTP) Agile Release Train it belongs to, alongside other platform capabilities like CTPSP."
+    },
+    {
+      "module": "12",
+      "title": "Understanding MuleSoft Architecture at Mutual of Omaha",
+      "format": "Self-paced, hands-on",
+      "description": "The company's specific MuleSoft architecture, including the dual-runtime model (CloudHub and Runtime Fabric) that made a generic MuleSoft course insufficient in the first place."
+    }
+  ],
+  "cadence": [
+    {
+      "title": "Weekly office hours",
+      "description": "A standing, low-friction slot for whoever's mid-module and stuck — optional, drop-in, no prep required on either side."
+    },
+    {
+      "title": "Cohort check-ins",
+      "description": "A lightweight touchpoint partway through a cohort's progression, surfacing where the curriculum itself is unclear before it becomes everyone's individual problem."
+    },
+    {
+      "title": "Escalation to 1:1 coaching",
+      "description": "For anyone still stuck after office hours — the exception path, not the default, so the self-paced model stays the primary on-ramp rather than becoming shadow 1:1 training."
+    }
+  ],
+  "reinforcement": [
+    "53+ documented participants and consistently positive survey feedback validated the format well before organic reuse did.",
+    "Still in active use by new MuleSoft engineers today, years after the last real update — the clearest evidence a program actually stuck rather than fading once the launch push ended.",
+    "Honest about its own decay: the CI/CD module still teaches Bitbucket and Jenkins, since replaced by GitHub. The rest of the content — MuleSoft development, testing, the company's actual architecture — has aged far better than the tooling around it."
+  ]
+}

@@ -1,0 +1,37 @@
+# Backstage software-catalog descriptor for this repo.
+#
+# This doesn't require a running Backstage instance to be valid - it's a
+# self-contained, inspectable artifact demonstrating IDP/service-catalog
+# conventions (see https://backstage.io/docs/features/software-catalog/descriptor-format/).
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: developer-experience-concepts
+  title: Résumé Site (Developer Experience Concepts)
+  description: >-
+    Static résumé/portfolio site on AWS (S3 + CloudFront), deployed via
+    CDK (TypeScript) and GitHub Actions using OIDC federation. Doubles as
+    a demonstration of golden-path platform engineering practices.
+  annotations:
+    github.com/project-slug: afsting/developer-experience-concepts
+  links:
+    - url: https://resume.pages-enterprise.com
+      title: Live site
+      icon: web
+    - url: https://github.com/afsting/developer-experience-concepts/blob/main/site/how-it-was-built.html
+      title: How this was built
+      icon: docs
+    - url: https://github.com/afsting/developer-experience-concepts/blob/main/README.md
+      title: README
+      icon: docs
+  tags:
+    - aws
+    - cdk
+    - typescript
+    - github-actions
+    - static-site
+spec:
+  type: website
+  lifecycle: production
+  owner: afsting
+  system: developer-experience-concepts

@@ -1,0 +1,38 @@
+name: CodeQL
+
+# Static analysis (SAST) for this repo's TypeScript (infra/) and
+# JavaScript (site/) code. CodeQL's javascript-typescript extractor works
+# directly from source — no build step required — so this covers both
+# without needing `tsc` first.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '23 8 * * 3'  # weekly, Wednesday ~08:23 UTC
+
+permissions:
+  contents: read
+  security-events: write  # Required to upload CodeQL results
+
+jobs:
+  analyze:
+    name: Analyze (javascript-typescript)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: '/language:javascript-typescript'

@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # infra/'s npm dependencies (aws-cdk-lib, aws-sdk clients, eslint, jest, etc.)
+  - package-ecosystem: "npm"
+    directory: "/infra"
+    schedule:
+      interval: "weekly"
+    groups:
+      aws-sdk:
+        patterns:
+          - "@aws-sdk/*"
+          - "aws-cdk*"
+
+  # GitHub Actions used in .github/workflows/*.yml
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

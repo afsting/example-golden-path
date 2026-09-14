@@ -1,0 +1,64 @@
+name: DORA Metrics Refresh
+
+# Recomputes site/dora-metrics.json from this repo's own deploy.yml run
+# history and writes it directly to the site's S3 bucket via a
+# narrowly-scoped OIDC role (s3:PutObject on that single object key only).
+#
+# Deliberately does NOT go through git/a PR/cdk deploy: a full deploy is
+# unnecessary infra churn for a data-only refresh, and — more importantly
+# — a PR opened by the default GITHUB_TOKEN can never trigger
+# cdk-diff.yml's `pull_request` workflow (GitHub's anti-recursion rule for
+# GITHUB_TOKEN-authored events), which is a *required* status check on
+# main, so an auto-merge would hang forever. Writing straight to S3 avoids
+# that entirely. The JSON is intentionally git-untracked (see .gitignore)
+# — it's fully reproducible from GitHub's own Actions API at any time, so
+# there's nothing to keep in sync with a committed copy.
+on:
+  schedule:
+    - cron: '17 6 * * *'  # daily, ~06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # Required for OIDC token exchange
+  contents: read
+  actions: read      # Required to read deploy.yml's own run history
+
+jobs:
+  refresh-metrics:
+    name: Refresh DORA metrics
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Compute DORA metrics
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/dora-metrics.mjs
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_METRICS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Look up site bucket name
+        id: bucket
+        run: |
+          BUCKET_NAME=$(aws cloudformation describe-stacks \
+            --stack-name ResumeSiteStack \
+            --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" \
+            --output text)
+          echo "bucket_name=$BUCKET_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Publish dora-metrics.json to S3
+        run: |
+          aws s3 cp site/dora-metrics.json \
+            "s3://${{ steps.bucket.outputs.bucket_name }}/dora-metrics.json" \
+            --cache-control "no-cache, no-store, must-revalidate"

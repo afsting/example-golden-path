@@ -1,0 +1,150 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write   # Required for OIDC token exchange
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: infra/package-lock.json
+
+      - name: Install CDK dependencies
+        working-directory: infra
+        run: npm ci
+
+      - name: Audit dependencies
+        working-directory: infra
+        # See cdk-diff.yml's matching step for why this is 'high'.
+        run: npm audit --audit-level=high
+
+      - name: Build CDK app
+        working-directory: infra
+        run: npm run build
+
+      - name: Lint
+        working-directory: infra
+        run: npm run lint
+
+      - name: Run CDK tests
+        working-directory: infra
+        run: npm test
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+          # OIDC federation — no long-lived AWS keys are stored as secrets.
+          # GitHub presents a short-lived OIDC token; AWS STS validates it
+          # and issues temporary credentials scoped to this role only.
+
+      - name: CDK deploy
+        working-directory: infra
+        env:
+          OTP_ADMIN_EMAIL: ${{ secrets.OTP_ADMIN_EMAIL }}
+          OTP_HMAC_SECRET: ${{ secrets.OTP_HMAC_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: npx cdk deploy --require-approval never --outputs-file cdk-outputs.json
+
+      - name: Extract CDK outputs
+        working-directory: infra
+        id: cdk-outputs
+        run: |
+          BUCKET_NAME=$(jq -r '.ResumeSiteStack.BucketName' cdk-outputs.json)
+          DISTRIBUTION_ID=$(jq -r '.ResumeSiteStack.DistributionId' cdk-outputs.json)
+          SITE_URL=$(jq -r '.ResumeSiteStack.SiteUrl' cdk-outputs.json)
+          echo "bucket_name=$BUCKET_NAME" >> "$GITHUB_OUTPUT"
+          echo "distribution_id=$DISTRIBUTION_ID" >> "$GITHUB_OUTPUT"
+          echo "site_url=$SITE_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Sync site to S3
+        run: |
+          # Sync HTML files with no-cache headers
+          aws s3 sync site/ "s3://${{ steps.cdk-outputs.outputs.bucket_name }}/" \
+            --exclude "*" \
+            --include "*.html" \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --delete
+
+          # Sync static assets with long-lived cache headers.
+          # dora-metrics.json / security-scorecard.json are excluded from
+          # both syncs — they're owned exclusively by their own scheduled
+          # workflows (dora-metrics.yml / security-scorecard.yml), which
+          # write directly to S3. Without this exclude, --delete here
+          # would remove them (they're git-untracked, so absent from this
+          # checkout) the next time this workflow runs.
+          aws s3 sync site/ "s3://${{ steps.cdk-outputs.outputs.bucket_name }}/" \
+            --exclude "*.html" \
+            --exclude "dora-metrics.json" \
+            --exclude "security-scorecard.json" \
+            --cache-control "max-age=31536000, immutable" \
+            --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ steps.cdk-outputs.outputs.distribution_id }}" \
+            --paths "/*"
+
+      - name: Smoke test
+        run: |
+          # /login.html specifically, not the homepage -- the OTP gate's
+          # session-check CloudFront Function redirects everything else to
+          # it for an unauthenticated request (which CI always is), so "/"
+          # would correctly 302 rather than 200. login.html is the one path
+          # explicitly exempted from the gate. A few retries with a short
+          # backoff absorb any brief propagation lag right after the
+          # invalidation above, rather than flaking an otherwise-good deploy.
+          SITE="${{ steps.cdk-outputs.outputs.site_url }}"
+          URL="$SITE/login.html"
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+            if [ "$STATUS" = "200" ]; then
+              echo "Smoke test passed: $URL returned 200"
+              break
+            fi
+            if [ "$i" = "5" ]; then
+              echo "Smoke test failed: $URL did not return 200 after 5 attempts"
+              exit 1
+            fi
+            echo "Attempt $i: $URL returned $STATUS, retrying in 5s..."
+            sleep 5
+          done
+
+          # The gate itself: an unauthenticated request to a gated path
+          # must be redirected to login, never served. A green deploy
+          # that had silently dropped the CloudFront Function association
+          # would otherwise look identical to a healthy one.
+          GATE=$(curl -s -o /dev/null -w "%{http_code} %{redirect_url}" "$SITE/")
+          case "$GATE" in
+            "302 $SITE/login.html") echo "Smoke test passed: / is gated ($GATE)" ;;
+            *) echo "Smoke test failed: expected / to 302 to login.html, got: $GATE"; exit 1 ;;
+          esac
+
+          # The auth API behind /auth/* is wired through CloudFront to
+          # API Gateway and answering.
+          SESSION=$(curl -s "$SITE/auth/session")
+          if [ "$SESSION" = '{"authenticated":false}' ]; then
+            echo "Smoke test passed: /auth/session reachable"
+          else
+            echo "Smoke test failed: unexpected /auth/session body: $SESSION"
+            exit 1
+          fi

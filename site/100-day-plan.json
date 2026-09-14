@@ -1,0 +1,138 @@
+{
+  "title": "My 100-Day Plan",
+  "framing": "This 100-day plan for stepping into a Developer Experience / Engineering Enablement leadership role is organized around three pillars: developer experience and internal platform ownership, engineering enablement and insights (DORA/SEI), and people leadership.",
+  "time_periods": [
+    { "key": "pre_start", "label": "Pre-Start" },
+    { "key": "days_0_30", "label": "Days 0-30" },
+    { "key": "days_31_60", "label": "Days 31-60" },
+    { "key": "days_61_100", "label": "Days 61-100" }
+  ],
+  "focus_areas": [
+    {
+      "key": "baseline",
+      "label": "Baseline",
+      "description": "Understanding the current state before proposing changes to it."
+    },
+    {
+      "key": "people",
+      "label": "People",
+      "description": "Building the relationships that everything else depends on."
+    },
+    {
+      "key": "process",
+      "label": "Process",
+      "description": "How platform, enablement, and metrics work actually gets governed and prioritized."
+    },
+    {
+      "key": "technology",
+      "label": "Technology",
+      "description": "The platform, tooling, and AI-assisted engineering capability itself."
+    },
+    {
+      "key": "personal",
+      "label": "Personal",
+      "description": "How I'm calibrating my own effectiveness in the role."
+    }
+  ],
+  "plan": {
+    "baseline": {
+      "pre_start": [
+        "Review whatever org chart, team roster, and existing platform/enablement documentation is available ahead of day one.",
+        "Identify the people worth shadowing early: whoever currently owns platform tooling, metrics reporting, and any existing enablement program.",
+        "Draft a lightweight assessment framework (what I want to know by day 30) so early conversations are structured, not just exploratory."
+      ],
+      "days_0_30": [
+        "Inventory existing internal-platform capabilities: service catalog, golden paths/templates, self-service tooling, and how discoverable they actually are to engineers.",
+        "Audit current DORA/SEI metric collection: what's measured, how, data quality, and whether anyone acts on it today.",
+        "Run a skills/capacity pass on the team (a strength-grid style exercise) to understand current bench strength and gaps.",
+        "Map current developer toolchain adoption (source control, CI/CD, artifact management, security scanning) against what's actually approved and standard."
+      ],
+      "days_31_60": [
+        "Synthesize the first-30-days findings into a current-state gap analysis and validate it with the team and key stakeholders.",
+        "Separate findings into quick wins vs. longer structural investments, and start sizing the latter."
+      ],
+      "days_61_100": [
+        "Publish a baseline engineering-health scorecard as the explicit 'before' reference point for tracking improvement from here forward."
+      ]
+    },
+    "people": {
+      "pre_start": [
+        "Map the key stakeholder groups I'll need relationships with: engineering leadership, security, architecture, product, and platform partner teams.",
+        "Identify my own manager's expectations and how they'll define success for this role in the first 90-100 days."
+      ],
+      "days_0_30": [
+        "1:1 with every direct report and every key cross-functional partner before doing much else.",
+        "Sit in on any existing Community of Practice, guild, or enablement forum as a participant before touching it as an owner.",
+        "Listen more than I act — keep a running log of open questions and ideas rather than reacting to the first thing that looks broken."
+      ],
+      "days_31_60": [
+        "Establish a regular 1:1 and team-meeting cadence, and set individual goals/development plans with each report.",
+        "Formalize a recurring stakeholder sync with security, architecture, and product so platform/enablement priorities stay aligned, not siloed.",
+        "Start actively coaching on career growth rather than just gathering context."
+      ],
+      "days_61_100": [
+        "Deliver a first real round of performance and growth feedback to the team.",
+        "Take visible ownership of (or relaunch, if it's stalled) a Community of Practice forum for knowledge sharing and feedback collection.",
+        "Confirm cross-functional partnership agreements are working in practice, not just on paper — adjust cadence/scope as needed."
+      ]
+    },
+    "process": {
+      "pre_start": [
+        "Review existing engineering standards, governance docs, and whatever lifecycle process currently keeps platform content current.",
+        "Review the existing enablement program structure (workshops, coaching, learning paths) if one already exists."
+      ],
+      "days_0_30": [
+        "Shadow the current platform-adoption process end to end, as an engineer would experience it, not just as documentation.",
+        "Understand how DORA/SEI metrics currently flow into action (or don't) — is there a real feedback loop from data to team-level improvement objectives?",
+        "Assess the governance and lifecycle process for platform content: how does anyone know if a golden path or doc is stale?"
+      ],
+      "days_31_60": [
+        "Propose lightweight governance improvements — e.g. explicit freshness/ownership expectations for golden paths and templates.",
+        "Pilot a cadence that ties DORA/SEI insights directly to team-level improvement objectives, in partnership with one or two engineering leaders.",
+        "Define an initial intake and prioritization process for the platform roadmap/backlog, rather than working from an ad hoc list."
+      ],
+      "days_61_100": [
+        "Formalize the platform roadmap and backlog intake process as a repeatable, documented cadence.",
+        "Launch the first structured enablement workshop or coaching cohort under the new cadence.",
+        "Establish a recurring engineering-health review with leadership, using the baseline scorecard as the starting reference."
+      ]
+    },
+    "technology": {
+      "pre_start": [
+        "Review the current toolchain end to end: source control, CI/CD, artifact management, security scanning, and any existing internal-platform tooling footprint.",
+        "Note where AI-assisted engineering practices are already being piloted informally, so I'm not proposing something that already exists."
+      ],
+      "days_0_30": [
+        "Complete a hands-on audit of service-catalog completeness, scorecard coverage, and where self-service actually breaks down for engineers.",
+        "Identify the highest-friction gap in the current golden-path/template set — the thing engineers most often work around rather than use."
+      ],
+      "days_31_60": [
+        "Pilot one concrete improvement with a volunteer team — a new golden-path template, an added scorecard dimension, or an AI-assisted engineering practice.",
+        "Evaluate DevSecOps gating coverage (dependency scanning, code scanning, secrets detection) against what's actually enforced in CI today."
+      ],
+      "days_61_100": [
+        "Ship the first platform improvement to general availability and publish it in the service catalog.",
+        "Publish an updated golden-path/template catalog reflecting what changed.",
+        "Document initial AI-assisted engineering guidance for broader rollout, based on what the pilot actually showed."
+      ]
+    },
+    "personal": {
+      "pre_start": [
+        "Get explicit clarity from my own manager on what success looks like at 30/60/100 days, in their words, not just my assumptions.",
+        "Identify my own learning gaps going in (specific platform tooling, industry/regulatory context) and set a lightweight plan to close them."
+      ],
+      "days_0_30": [
+        "Deliberately favor listening and learning over doing — resist the urge to fix the first thing that looks broken.",
+        "Keep a personal log of open questions and quick-win ideas rather than acting on all of them immediately."
+      ],
+      "days_31_60": [
+        "Check in explicitly with my own manager on progress against the expectations set before day one, and adjust course if the read differs from theirs.",
+        "Adjust my own working rhythm (meeting load vs. deep-work time) based on what the first month actually revealed about where my time is needed."
+      ],
+      "days_61_100": [
+        "Do a formal self-review against the original 30/60/100 success measures, honestly noting what didn't go to plan.",
+        "Set explicit next-90-day goals with my manager, informed by the baseline scorecard and the team/stakeholder feedback gathered so far."
+      ]
+    }
+  }
+}
