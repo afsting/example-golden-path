@@ -10,6 +10,18 @@ updates:
         patterns:
           - "@aws-sdk/*"
           - "aws-cdk*"
+    ignore:
+      # @typescript-eslint/eslint-plugin's peer range caps at
+      # "typescript@<6.1.0" (confirmed against @typescript-eslint's own
+      # latest release) -- a real, current npm ecosystem gap, not a
+      # version we've chosen to skip. Without this, Dependabot proposes
+      # the major bump anyway, and with no branch protection on main here,
+      # that PR merges straight through and breaks `npm ci` via an
+      # ERESOLVE peer-dependency conflict -- exactly what happened on
+      # 2026-09-14, which is what this PR fixes.
+      # Remove this once @typescript-eslint ships TypeScript 7 support.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   # GitHub Actions used in .github/workflows/*.yml
   - package-ecosystem: "github-actions"

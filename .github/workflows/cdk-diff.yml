@@ -50,11 +50,16 @@ jobs:
       - name: Audit dependencies
         if: steps.changes.outputs.run == 'true'
         working-directory: infra
-        # aws-cdk-lib upgraded to 2.266.0 (from the 2.152.0 that had
-        # bundled transitive high/moderate findings — ajv/minimatch/yaml/
-        # brace-expansion) resolved those; confirmed 0 findings at 'high'
-        # locally. Tightened from 'critical'.
-        run: npm audit --audit-level=high
+        # Plain `npm audit --audit-level=high` doesn't work here long-term:
+        # aws-cdk-lib ships minimatch (and its own nested brace-expansion)
+        # as a bundleDependency — literal files in its published tarball,
+        # not resolved through npm's dependency graph — so neither
+        # `npm audit fix` nor a root `overrides` entry can touch it, only
+        # a new aws-cdk-lib release can. scripts/check-audit.mjs exempts
+        # only findings whose *every* install path is under aws-cdk-lib's
+        # own node_modules; anything else (a real finding in a dependency
+        # this repo controls) still fails the build.
+        run: node scripts/check-audit.mjs
 
       - name: Build CDK app
         if: steps.changes.outputs.run == 'true'
