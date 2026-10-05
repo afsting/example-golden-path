@@ -51,8 +51,13 @@ jobs:
       - name: Look up site bucket name
         id: bucket
         run: |
+          # This is a "Use this template" clone deployed as its own stack,
+          # ExampleGoldenPathStack (see deploy.yml's CDK deploy step) --
+          # the metrics IAM role's DescribeStacks permission is scoped to
+          # exactly that stack ARN, so ResumeSiteStack would fail here
+          # with AccessDenied even before considering it's the wrong site.
           BUCKET_NAME=$(aws cloudformation describe-stacks \
-            --stack-name ResumeSiteStack \
+            --stack-name ExampleGoldenPathStack \
             --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" \
             --output text)
           echo "bucket_name=$BUCKET_NAME" >> "$GITHUB_OUTPUT"
