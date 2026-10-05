@@ -100,6 +100,16 @@ jobs:
           OTP_ADMIN_EMAIL: ${{ secrets.OTP_ADMIN_EMAIL }}
           OTP_HMAC_SECRET: ${{ secrets.OTP_HMAC_SECRET }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          # This is a "Use this template" clone of developer-experience-concepts
+          # deployed as its own, independent copy of ResumeSiteStack (see that
+          # class's doc comment) -- these overrides are what keep it from
+          # targeting the original repo's stack/domain/roles. Without them,
+          # bin/resume-site.ts's defaults point straight at ResumeSiteStack.
+          STACK_NAME: ExampleGoldenPathStack
+          SITE_DOMAIN_NAME: example.pages-enterprise.com
+          GITHUB_OIDC_PROVIDER_ARN: arn:aws:iam::315326805073:oidc-provider/token.actions.githubusercontent.com
+          GITHUB_ROLE_NAME_PREFIX: github-actions-example-golden-path
+          GITHUB_REPO_NAME: example-golden-path
         run: |
           # Capture diff output; exit 0 even if there are changes (exit 1 = changes, 2 = error)
           DIFF_OUTPUT=$(npx cdk diff 2>&1 || true)
